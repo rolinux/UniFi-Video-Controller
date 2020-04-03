@@ -1,5 +1,5 @@
-FROM phusion/baseimage:0.11
-MAINTAINER pducharme@me.com
+FROM ubuntu
+MAINTAINER Radu Coroi
 
 # Version
 ENV version 3.10.11
@@ -17,23 +17,26 @@ ADD unifi-video.patch /unifi-video.patch
 ADD run.sh /run.sh
 
 # Add mongodb repo, key, update and install needed packages
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
+RUN  apt-get update && \
+  apt-get install -y apt-utils gnupg && \
+  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
   echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-4.0.list && \
-  apt-get update && \
-  apt-get install -y apt-utils && \
-  apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
+  apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
   apt-get install -y  \
+    psmisc \
+    lsb-release \
+    libcap2 \
     jsvc \
     jq \
     moreutils \
-    openjdk-8-jre-headless \
+    openjdk-8-jdk-headless \
     patch \
     sudo \
     tzdata \
-    mongodb-org-server \
-    mongodb-org-shell \
     moreutils \
-    wget
+    wget \ 
+    mongodb-org-server \
+    mongodb-org-shell
 
 # Get, install and patch unifi-video
 RUN wget -q -O unifi-video.deb https://dl.ubnt.com/firmwares/ufv/v${version}/unifi-video.Ubuntu18.04_amd64.v${version}.deb && \
