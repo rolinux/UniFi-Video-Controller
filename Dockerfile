@@ -18,11 +18,11 @@ ADD run.sh /run.sh
 
 # Add mongodb repo, key, update and install needed packages
 RUN  apt-get update && \
-  apt-get install -y apt-utils gnupg && \
+  apt-get install -y apt-utils gnupg1 && \
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
   echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-4.0.list && \
   apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
-  apt-get install -y  \
+  apt-get install --no-install-recommends --no-install-suggests -y  \
     psmisc \
     lsb-release \
     libcap2 \
@@ -36,7 +36,9 @@ RUN  apt-get update && \
     moreutils \
     wget \ 
     mongodb-org-server \
-    mongodb-org-shell
+    mongodb-org-shell && \
+    apt-get purge -y --auto-remove && \
+    rm -rf /var/lib/apt/lists/*
 
 # Get, install and patch unifi-video
 RUN wget -q -O unifi-video.deb https://dl.ubnt.com/firmwares/ufv/v${version}/unifi-video.Ubuntu18.04_amd64.v${version}.deb && \
